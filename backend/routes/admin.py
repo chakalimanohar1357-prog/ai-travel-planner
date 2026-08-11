@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from extensions import db
 from models import User, Destination, Hotel, Restaurant, Attraction, Trip
@@ -159,3 +159,20 @@ def delete_attraction(attraction_id):
     db.session.delete(attraction)
     db.session.commit()
     return jsonify({"message": "Attraction deleted"})
+
+
+# ---------------- TEMPORARY: one-time production seed ----------------
+# Delete this entire route once you've used it successfully -- it's only
+# here because Render's free tier has no Shell access to run
+# `python -m data.seed_data` directly. Protected by SECRET_KEY so a random
+# visitor can't wipe/reseed your live data.
+
+@admin_bp.route("/seed-database", methods=["GET"])
+def seed_database_once():
+    secret = request.args.get("key", "")
+    if secret != current_app.config.get("SECRET_KEY"):
+        return jsonify({"error": "Unauthorized"}), 403
+
+    from data.seed_data import seed
+    seed()
+    return jsonify({"message": "Database seeded successfully"})
