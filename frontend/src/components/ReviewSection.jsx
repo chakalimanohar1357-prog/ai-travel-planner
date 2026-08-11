@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Star, Trash2 } from "lucide-react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -28,15 +28,17 @@ export default function ReviewSection({ destinationId }) {
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
-    const loadReviews = () => {
+    const loadReviews = useCallback(() => {
         api.get(`/reviews/destinations/${destinationId}`).then((res) => {
             setReviews(res.data.reviews);
             setAverageRating(res.data.average_rating);
             setTotalReviews(res.data.total_reviews);
         });
-    };
+    }, [destinationId]);
 
-    useEffect(() => { loadReviews(); }, [destinationId]);
+    useEffect(() => {
+        loadReviews();
+    }, [loadReviews]);
 
     const submitReview = async (e) => {
         e.preventDefault();
