@@ -9,7 +9,10 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-jwt-secret")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
 
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///travel_planner.db")
+    _database_url = os.getenv("DATABASE_URL", "sqlite:///travel_planner.db")
+    if _database_url.startswith("postgres://"):
+        _database_url = _database_url.replace("postgres://", "postgresql://", 1)
+    SQLALCHEMY_DATABASE_URI = _database_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
