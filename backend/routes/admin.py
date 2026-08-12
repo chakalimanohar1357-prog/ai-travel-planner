@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from extensions import db
 from models import User, Destination, Hotel, Restaurant, Attraction, Trip
@@ -16,20 +16,6 @@ def admin_required(fn):
             return jsonify({"error": "Admin access required"}), 403
         return fn(*args, **kwargs)
     return wrapper
-
-
-# ---------------- TEMPORARY: one-time database seed ----------------
-# Remove this route once the database has been confirmed seeded.
-
-@admin_bp.route("/seed-database", methods=["GET"])
-def seed_database_once():
-    secret = request.args.get("key", "")
-    if secret != current_app.config.get("SECRET_KEY"):
-        return jsonify({"error": "Unauthorized"}), 403
-
-    from data.seed_data import seed
-    seed()
-    return jsonify({"message": "Database seeded successfully"})
 
 
 @admin_bp.route("/stats", methods=["GET"])
