@@ -11,7 +11,9 @@ class Config:
 
     _database_url = os.getenv("DATABASE_URL", "sqlite:///travel_planner.db")
     if _database_url.startswith("postgres://"):
-        _database_url = _database_url.replace("postgres://", "postgresql://", 1)
+        _database_url = _database_url.replace("postgres://", "postgresql+pg8000://", 1)
+    elif _database_url.startswith("postgresql://"):
+        _database_url = _database_url.replace("postgresql://", "postgresql+pg8000://", 1)
     SQLALCHEMY_DATABASE_URI = _database_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
